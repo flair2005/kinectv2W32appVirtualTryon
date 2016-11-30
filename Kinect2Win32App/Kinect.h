@@ -31,6 +31,8 @@ public:
 										 const BYTE* pBodyIndexBuffer, int nBodyIndexWidth, int nBodyIndexHeight);
 	void					fillHole(const Mat srcBw, Mat &dstBw);//¿×¶´Ìî³ä
 	void					getSizeContours(vector<vector<Point>> &contours);//È¥³ýÐ¡ÂÖÀª
+	UINT16					findDepthBuffer(DepthSpacePoint DSP, int DSP_SIZE, const UINT16 *pDepthBuffer);
+	vector<Point>					getBodyContoursPoint(vector<vector<Point>> &contours);
 private:
 	IKinectSensor*          m_pKinectSensor;// Current Kinect
 	// Frame reader
@@ -42,6 +44,8 @@ private:
 	RGBQUAD*                m_pColorRGBX;
 	RGBQUAD*                m_pBackgroundRGBX;
 	RGBQUAD*                m_pDepthRGBX;
+
+	//IBody**					myBodyArr;//
 
 	Mat						m_Depth;
 	Mat						m_Color;
