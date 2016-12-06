@@ -36,6 +36,9 @@
     <ClInclude Include="FileWriter.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="featurePoint.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -48,6 +51,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Kinect2Win32App.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="featurePoint.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

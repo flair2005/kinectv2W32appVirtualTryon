@@ -5,6 +5,7 @@
 #include <map>
 #include <limits>
 #include <strsafe.h>
+
 static const DWORD c_AppRunTime = 5 * 60;//程序运行时间(s)，设置5*60表示运行5分钟后程序自动关闭
 static const float c_JointThickness = 3.0f;
 static const float c_TrackedBoneThickness = 6.0f;
@@ -39,6 +40,8 @@ CKinect::CKinect()
 	m_Depth.create(cDepthHeight, cDepthWidth, CV_16UC1);
 	m_Color.create(cColorHeight, cColorWidth, CV_8UC4);
 	m_BodyIndex.create(cDepthHeight, cDepthWidth, CV_8UC1);
+
+	fpt = new featurePoint();
 }
 
 
@@ -63,6 +66,7 @@ CKinect::~CKinect()
 	}
 
 	SafeRelease(m_pKinectSensor);
+	delete fpt;
 }
 
 
@@ -482,6 +486,24 @@ void CKinect::ProcessFrame(INT64 nTime,
 	for (int i = 0; i < userContour.size(); i++){
 		circle(showImage, Point(userContour[i].x, userContour[i].y), 5, CV_RGB(255, 255, 0), -1, 8, 0);
 	}
+	
+	const Scalar color[] = {
+		CV_RGB(255, 0, 0), CV_RGB(0, 255, 0), CV_RGB(0, 0, 255),
+		CV_RGB(255, 255, 0), CV_RGB(255, 0, 255), CV_RGB(0, 255, 255),
+		CV_RGB(128, 0, 0), CV_RGB(0, 128, 0), CV_RGB(0, 0, 128),
+		CV_RGB(128, 128, 0), CV_RGB(128, 0, 128), CV_RGB(0, 128, 128),
+		CV_RGB(64, 0, 0), CV_RGB(0, 0, 0)
+	};
+
+	fpt->featurepointInit();
+	IplImage *IPLshowImage;
+	IPLshowImage = &IplImage(showImage);
+	fpt->getCircle200(IPLshowImage, userContour);
+	cout << "contoursPoint2.size()="<<fpt->contoursPoint2.size() << endl;
+	vector<Point>tempp = fpt->contoursPoint2;
+	cout << "tempp.size()=" << tempp.size() << endl;
+	fpt->getSpecialPoint27(IPLshowImage, tempp);
+	//fpt->getBodyRegion(m_bg, IPLshowImage);
 	//Mat m_bg(cColorHeight, cColorWidth, CV_8UC4,Scalar(0,0,0));
 	//寻找彩色图中人体的点
 
@@ -565,7 +587,7 @@ void CKinect::ProcessFrame(INT64 nTime,
 					hr = m_pCoordinateMapper->MapCameraPointToColorSpace(joint[JointType_HandRight].Position, &colorSpacePoint);
 					if (SUCCEEDED(hr)){
 						int x = static_cast<int>(colorSpacePoint.X);
-						int y = static_cast<int>(colorSpacePoint.X);;
+						int y = static_cast<int>(colorSpacePoint.Y);;
 						if ((x >= 0) && (x < cColorWidth) && (y >= 0) && (y < cColorHeight)){
 							if (rightHandState == HandState::HandState_Open){
 								cv::circle(showImage, cv::Point(x, y), 75, cv::Scalar(0, 128, 0), 5, CV_AA);
@@ -594,7 +616,7 @@ void CKinect::ProcessFrame(INT64 nTime,
 		}
 		//resize(m_Color, showImage, cv::Size(),0.5,0.5);
 	}
-
+	
 	cout << endl;
 	imshow("Color", showImage);
 	RGBQUAD* pRGBX = m_pDepthRGBX;

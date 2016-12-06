@@ -1,6 +1,7 @@
 #pragma once
 #include <Kinect.h>// Kinect Header files
 #include "include_opencv/opencv2/opencv.hpp"
+#include "featurePoint.h"
 using namespace cv;
 // Safe release for interfaces
 template<class Interface>
@@ -50,5 +51,6 @@ private:
 	Mat						m_Depth;
 	Mat						m_Color;
 	Mat						m_BodyIndex;
+	featurePoint*           fpt;
 };
 
