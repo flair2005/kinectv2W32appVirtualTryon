@@ -2,6 +2,9 @@
 #include <Kinect.h>// Kinect Header files
 #include "include_opencv/opencv2/opencv.hpp"
 #include "featurePoint.h"
+#include "Garment.h"
+#include "Model.h"
+using namespace std;
 using namespace cv;
 // Safe release for interfaces
 template<class Interface>
@@ -22,8 +25,9 @@ public:
 	static const int        cColorWidth = 1920;
 	static const int        cColorHeight = 1080;
 	CKinect();
+	
 	~CKinect();
-	HRESULT					InitKinect();//初始化Kinect
+	HRESULT					InitKinect(Model mod);//初始化Kinect
 	void					Update();//更新数据
 	void                    ProcessFrame(INT64 nTime,
 										 const UINT16* pDepthBuffer, int nDepthHeight, int nDepthWidth, USHORT nMinDepth, USHORT nMaxDepth,
@@ -33,7 +37,13 @@ public:
 	void					fillHole(const Mat srcBw, Mat &dstBw);//孔洞填充
 	void					getSizeContours(vector<vector<Point>> &contours);//去除小轮廓
 	UINT16					findDepthBuffer(DepthSpacePoint DSP, int DSP_SIZE, const UINT16 *pDepthBuffer);
-	vector<Point>					getBodyContoursPoint(vector<vector<Point>> &contours);
+	vector<Point>			getBodyContoursPoint(vector<vector<Point>> &contours);
+	
+	void					deformation();
+
+	Rect					contourRect;
+	Mat						m_body;
+
 private:
 	IKinectSensor*          m_pKinectSensor;// Current Kinect
 	// Frame reader
@@ -52,5 +62,8 @@ private:
 	Mat						m_Color;
 	Mat						m_BodyIndex;
 	featurePoint*           fpt;
+	Garment*                gmt;
+	Model*					mdl;
+
 };
 

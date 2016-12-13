@@ -42,6 +42,8 @@ CKinect::CKinect()
 	m_BodyIndex.create(cDepthHeight, cDepthWidth, CV_8UC1);
 
 	fpt = new featurePoint();
+	gmt = new Garment();
+	mdl = new Model();
 }
 
 
@@ -67,11 +69,15 @@ CKinect::~CKinect()
 
 	SafeRelease(m_pKinectSensor);
 	delete fpt;
+	delete gmt;
+	delete mdl;
 }
 
 
-HRESULT	CKinect::InitKinect()
+HRESULT	CKinect::InitKinect(Model mod)
 {
+	mdl = &mod;
+	if (!mdl) return E_FAIL;
 	HRESULT hr;
 
 	hr = GetDefaultKinectSensor(&m_pKinectSensor);
@@ -110,6 +116,7 @@ HRESULT	CKinect::InitKinect()
 
 void CKinect::Update()
 {
+	//cout << "kinect update" << endl;
 	if (!m_pMultiSourceFrameReader)
 	{
 		return;
@@ -487,13 +494,6 @@ void CKinect::ProcessFrame(INT64 nTime,
 		circle(showImage, Point(userContour[i].x, userContour[i].y), 5, CV_RGB(255, 255, 0), -1, 8, 0);
 	}
 	
-	const Scalar color[] = {
-		CV_RGB(255, 0, 0), CV_RGB(0, 255, 0), CV_RGB(0, 0, 255),
-		CV_RGB(255, 255, 0), CV_RGB(255, 0, 255), CV_RGB(0, 255, 255),
-		CV_RGB(128, 0, 0), CV_RGB(0, 128, 0), CV_RGB(0, 0, 128),
-		CV_RGB(128, 128, 0), CV_RGB(128, 0, 128), CV_RGB(0, 128, 128),
-		CV_RGB(64, 0, 0), CV_RGB(0, 0, 0)
-	};
 
 	fpt->featurepointInit();
 	IplImage *IPLshowImage;
@@ -503,6 +503,28 @@ void CKinect::ProcessFrame(INT64 nTime,
 	vector<Point>tempp = fpt->contoursPoint2;
 	cout << "tempp.size()=" << tempp.size() << endl;
 	fpt->getSpecialPoint27(IPLshowImage, tempp);
+	if (userContour.size()){
+		contourRect = boundingRect(userContour);
+		rectangle(showImage,contourRect,Scalar(255,128,64));
+		cout << "contourRect.size=" << contourRect.size() << endl;
+		m_body = showImage(contourRect);
+		Mat m_body2;
+		resize(m_body, m_body2, cv::Size(), 0.5, 0.5);
+		imshow("bodybody", m_body2);
+		/*IplImage *bodyImage, *cpBodyImage;
+		bodyImage = &IplImage(showImage);
+		cpBodyImage = cvCreateImage(contourRect.size(), 8, 3);
+		cvSetImageROI(bodyImage, contourRect);
+		cvCopy(bodyImage, cpBodyImage);
+		Mat m_body2(cpBodyImage);
+		m_body = m_body2.clone();
+		imshow("bodybody", m_body);
+		cvResetImageROI(bodyImage);
+		free(bodyImage);
+		bodyImage = NULL;
+		free(cpBodyImage);
+		cpBodyImage = NULL;*/
+	}
 	//fpt->getBodyRegion(m_bg, IPLshowImage);
 	//Mat m_bg(cColorHeight, cColorWidth, CV_8UC4,Scalar(0,0,0));
 	//寻找彩色图中人体的点
@@ -618,7 +640,11 @@ void CKinect::ProcessFrame(INT64 nTime,
 	}
 	
 	cout << endl;
-	imshow("Color", showImage);
+	//imshow("Color", showImage);
+
+	Mat showImageResize;
+	resize(showImage, showImageResize, cv::Size(), 0.5, 0.5);
+	imshow("Color", showImageResize);
 	RGBQUAD* pRGBX = m_pDepthRGBX;
 	// end pixel is start + width*height - 1
 	const UINT16* pBufferEnd = pDepthBuffer + (nDepthWidth * nDepthHeight);
@@ -704,4 +730,10 @@ vector<Point>  CKinect::getBodyContoursPoint(vector<vector<Point>> &contours)
 	vector<Point>contoursPoint = temp;
 	//cout << "contoursPoint1_size()=" << contoursPoint1.size() << endl;
 	return contoursPoint;
+}
+
+void CKinect::deformation(){
+	//cout << mdl->fpt->featurePt.size() << "|model|" << mdl->fpt->auxiliaryPoints.size() << endl;
+	cout << fpt->featurePt.size() << "|kinect|"<<fpt->auxiliaryPoints.size()<<endl;
+	//imshow("defor_color", m_Color);
 }
