@@ -16,16 +16,16 @@ int main()
 	mod.modelInitial();
 	CKinect kinect;
 	kinect.InitKinect(mod);
-	Deformation def;
-	def.deformationInit(mod,kinect,gar);
+	//Deformation* def= new Deformation();
+	//def->deformationInit(mod,kinect,gar);
 	while(1)
 	{
 		kinect.Update();
 		//kinect.deformation();
-		def.computing();
+		//def->computing();
 	}
 	//system("pause");
-	//delete mod;
+	//delete def;
 	return 0;
 }
 
