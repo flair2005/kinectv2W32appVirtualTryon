@@ -3,7 +3,6 @@
 #include <windows.h>
 #include <Mmsystem.h>//需要 Winmm.lib库的支持 ----timeGetTime()
 //#include "Kinect.h"//主函数
-#include "Defor.h"
 #include <cstdlib>
 #include "Transfer.h"
 
@@ -16,10 +15,10 @@ int main()
 	mod.modelInitial();
 	CKinect kinect;
 	kinect.InitKinect(mod);
-	//Deformation* def= new Deformation();
-	//Deformation def;
-	//def->deformationInit(mod,kinect,gar);
 	Transfer tra;
+	//tra.getModel(mod);
+	cout << "mod.contourRect.size="<<mod.contourRect.size() << endl;
+	system("pause");
 	while(1)
 	{
 		kinect.Update();

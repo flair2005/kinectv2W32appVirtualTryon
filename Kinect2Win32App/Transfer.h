@@ -12,6 +12,13 @@ public:
 	~Transfer();
 	void transferInit(Model mod,Garment gar,CKinect kin);
 	void transComputing();
+	void getModel(Model model);
+	void getGarment(Garment garment);
+	void getKinect(CKinect kinect);
+	void getmUser();
+	void getmModel();
+	void getRectUser();
+	void getrectModel();
 	Model mod;
 	Garment gar;
 	CKinect kin;
