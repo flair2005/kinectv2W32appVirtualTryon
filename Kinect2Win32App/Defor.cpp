@@ -1,11 +1,11 @@
 #include "stdafx.h"
-#include "Deformation.h"
+#include "Defor.h"
 
 Deformation::Deformation(){
 
 }
 Deformation::~Deformation(){
-	
+
 }
 
 void Deformation::deformationInit(Model mod, CKinect kin, Garment gar){

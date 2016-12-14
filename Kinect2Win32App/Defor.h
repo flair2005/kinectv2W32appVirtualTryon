@@ -1,5 +1,5 @@
-#ifndef DEFORMATION_H
-#define DEFORMATION_H
+//#ifndef DEFOR_H
+//#define DEFOR_H
 
 /*#include <iostream>
 #include <vector>
@@ -28,4 +28,4 @@ private:
 	Rect rect_model;
 };
 
-#endif
+//#endif

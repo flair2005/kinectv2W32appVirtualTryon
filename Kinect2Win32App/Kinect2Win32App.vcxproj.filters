@@ -45,7 +45,10 @@
     <ClInclude Include="Model.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Deformation.h">
+    <ClInclude Include="Defor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Transfer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,7 +74,10 @@
     <ClCompile Include="Model.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Deformation.cpp">
+    <ClCompile Include="Defor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Transfer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
