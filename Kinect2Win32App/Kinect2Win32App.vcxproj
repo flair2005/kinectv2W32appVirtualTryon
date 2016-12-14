@@ -82,7 +82,6 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Defor.h" />
     <ClInclude Include="featurePoint.h" />
     <ClInclude Include="FileWriter.h" />
     <ClInclude Include="Garment.h" />
@@ -95,7 +94,6 @@
     <ClInclude Include="Transfer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Defor.cpp" />
     <ClCompile Include="featurePoint.cpp" />
     <ClCompile Include="FileWriter.cpp" />
     <ClCompile Include="Garment.cpp" />

@@ -23,12 +23,10 @@ int main()
 	while(1)
 	{
 		kinect.Update();
-		//tra.transComputing();
+		tra.transComputing();
 	}
-	//system("pause");
-	//delete def;
+
 	return 0;
 }
 
 
- 
