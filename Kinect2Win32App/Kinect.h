@@ -25,7 +25,8 @@ public:
 	static const int        cColorWidth = 1920;
 	static const int        cColorHeight = 1080;
 	CKinect();
-	
+	CKinect(const CKinect& kin);
+	CKinect& operator = (const CKinect &);
 	~CKinect();
 	HRESULT					InitKinect(Model mod);//初始化Kinect
 	void					Update();//更新数据

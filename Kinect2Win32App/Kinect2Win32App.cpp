@@ -16,12 +16,13 @@ int main()
 	CKinect kinect;
 	kinect.InitKinect(mod);
 	Transfer tra;
-	//tra.getModel(mod);
-	cout << "mod.contourRect.size="<<mod.contourRect.size() << endl;
-	system("pause");
+	tra.getModel(mod);
+	//cout << "mod.contourRect.size="<<mod.contourRect.size() << endl;
+	//system("pause");
 	while(1)
 	{
 		kinect.Update();
+		tra.getKinect(kinect);
 		tra.transComputing();
 	}
 

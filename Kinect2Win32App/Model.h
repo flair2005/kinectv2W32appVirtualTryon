@@ -11,11 +11,13 @@ using namespace cv;
 class Model{
 public:
 	Model();
+	Model(const Model& m);
 	~Model();
 	void modelInitial();
 	featurePoint* fpt;
 	Rect contourRect;
 	Mat m_body;
+	Model& operator = (const Model&);
 private:
 	Mat m_model;
 };

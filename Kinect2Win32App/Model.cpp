@@ -5,10 +5,27 @@ Model::Model(){
 	fpt = new featurePoint();
 }
 
+Model::Model(const Model& m){
+	fpt = new featurePoint;
+	*fpt=*(m.fpt);
+	contourRect = m.contourRect;
+	m_body = m.m_body;
+	//m_model = m.m_model;
+}
 Model::~Model(){
 	delete fpt;
 }
+Model& Model:: operator = (const Model&m){
 
+	if(fpt!=NULL) delete fpt;
+	fpt = new featurePoint;
+	*fpt = *m.fpt;
+	contourRect = m.contourRect;
+	m_body = m.m_body.clone();
+	m_model = m.m_model.clone();
+
+	return *this;
+}
 void Model::modelInitial(){
 	fpt->featurepointInit();
 	IplImage *plmgsrc = cvLoadImage("cccc.png");
@@ -55,5 +72,7 @@ void Model::modelInitial(){
 	m_body = src(contourRect);
 	imshow("body", m_body);
 
+	//delete plmg8u;
+	//delete plmgCanny;
 }
 

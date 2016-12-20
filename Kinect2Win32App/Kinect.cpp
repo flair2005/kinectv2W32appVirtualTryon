@@ -45,7 +45,90 @@ CKinect::CKinect()
 	gmt = new Garment();
 	mdl = new Model();
 }
+CKinect::CKinect(const CKinect& kin){
+	/*m_pKinectSensor = NULL;
+	m_pCoordinateMapper = NULL;
+	m_pMultiSourceFrameReader = NULL;
+	m_pDepthCoordinates = NULL;
+	m_pOutputRGBX = NULL;
+	m_pBackgroundRGBX = NULL;
+	m_pColorRGBX = NULL;
 
+	//m_pKinectSensor = new IKinectSensor;
+	// create heap storage for composite image pixel data in RGBX format
+	m_pOutputRGBX = new RGBQUAD[cColorWidth * cColorHeight];
+
+	// create heap storage for background image pixel data in RGBX format
+	m_pBackgroundRGBX = new RGBQUAD[cColorWidth * cColorHeight];
+
+	// create heap storage for color pixel data in RGBX format
+	m_pColorRGBX = new RGBQUAD[cColorWidth * cColorHeight];
+
+	// create heap storage for the coorinate mapping from color to depth
+	m_pDepthCoordinates = new DepthSpacePoint[cColorWidth * cColorHeight];
+
+	m_pDepthRGBX = new RGBQUAD[cDepthWidth * cDepthHeight];// create heap storage for color pixel data in RGBX format
+
+	*m_pOutputRGBX = *kin.m_pOutputRGBX;
+	*m_pBackgroundRGBX = *kin.m_pBackgroundRGBX;
+	*m_pColorRGBX = *kin.m_pColorRGBX;
+	*m_pDepthCoordinates = *kin.m_pDepthCoordinates;
+	*m_pDepthRGBX = *kin.m_pDepthRGBX;
+	*/
+	m_body = kin.m_body;
+	contourRect = kin.contourRect;
+	m_Depth=kin.m_Depth;
+	m_Color; kin.m_Color;
+	m_BodyIndex=kin.m_BodyIndex;
+	fpt=new featurePoint;
+	*fpt = *kin.fpt;
+	gmt=new Garment;
+	*gmt = *kin.gmt;
+	mdl=new Model;
+	*mdl = *kin.mdl;
+
+}
+
+CKinect& CKinect::operator = (const CKinect& kin){
+	if (fpt != NULL) delete fpt;
+	fpt = new featurePoint;
+	*fpt = *kin.fpt;
+	if (gmt != NULL) delete gmt;
+	gmt = new Garment;
+	*gmt = *kin.gmt;
+	if (mdl != NULL) delete mdl;
+	mdl = new Model;
+	*mdl = *kin.mdl;
+
+	m_body = kin.m_body;
+	contourRect = kin.contourRect;
+	m_Depth = kin.m_Depth;
+	m_Color; kin.m_Color;
+	m_BodyIndex = kin.m_BodyIndex;
+	/*
+	//m_pKinectSensor = new IKinectSensor;
+	// create heap storage for composite image pixel data in RGBX format
+	m_pOutputRGBX = new RGBQUAD[cColorWidth * cColorHeight];
+
+	// create heap storage for background image pixel data in RGBX format
+	m_pBackgroundRGBX = new RGBQUAD[cColorWidth * cColorHeight];
+
+	// create heap storage for color pixel data in RGBX format
+	m_pColorRGBX = new RGBQUAD[cColorWidth * cColorHeight];
+
+	// create heap storage for the coorinate mapping from color to depth
+	m_pDepthCoordinates = new DepthSpacePoint[cColorWidth * cColorHeight];
+
+	m_pDepthRGBX = new RGBQUAD[cDepthWidth * cDepthHeight];// create heap storage for color pixel data in RGBX format
+
+	*m_pOutputRGBX = *kin.m_pOutputRGBX;
+	*m_pBackgroundRGBX = *kin.m_pBackgroundRGBX;
+	*m_pColorRGBX = *kin.m_pColorRGBX;
+	*m_pDepthCoordinates = *kin.m_pDepthCoordinates;
+	*m_pDepthRGBX = *kin.m_pDepthRGBX;
+	*/
+	return *this;
+}
 
 CKinect::~CKinect()
 {
