@@ -14,11 +14,12 @@ public:
 	void transComputing();
 	void getModel(Model model);
 	void getGarment(Garment garment);
-	void getKinect(CKinect kinect);
+	void getKinect(CKinect &kinect);
 	void getmUser();
 	void getmModel();
 	void getRectUser();
 	void getrectModel();
+	void getmGarment();
 	Model mod;
 	Garment gar;
 	CKinect kin;
@@ -27,6 +28,7 @@ private:
 	Mat m_model;
 	Rect rect_user;
 	Rect rect_model;
+	Mat m_garment;
 };
 
 #endif

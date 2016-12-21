@@ -36,8 +36,8 @@ public:
 	featurePoint();
 	~featurePoint();
 
-
-
+	featurePoint(const featurePoint& fpt);
+	featurePoint& operator = (const featurePoint& fpt);
 	void featurepointInit();
 	//void getSpecialPoint27(vector<Point>contoursPoints);
 	double getDistance(Point p1, Point p2);

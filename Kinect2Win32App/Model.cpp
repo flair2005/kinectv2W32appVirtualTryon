@@ -15,13 +15,13 @@ Model::Model(const Model& m){
 Model::~Model(){
 	delete fpt;
 }
-Model& Model:: operator = (const Model&m){
+Model& Model:: operator = (const Model& m){
 
-	if(fpt!=NULL) delete fpt;
+	if (fpt != NULL) delete fpt;
 	fpt = new featurePoint;
 	*fpt = *m.fpt;
 	contourRect = m.contourRect;
-	m_body = m.m_body.clone();
+	m_body = m.m_body;
 	m_model = m.m_model.clone();
 
 	return *this;

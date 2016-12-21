@@ -23,6 +23,7 @@ int main()
 	{
 		kinect.Update();
 		tra.getKinect(kinect);
+		tra.getGarment(gar);
 		tra.transComputing();
 	}
 

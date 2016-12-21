@@ -5,6 +5,17 @@
 Garment::Garment(){
 
 }
+Garment::Garment(const Garment& gar){
+	if (!m_garment.empty()) m_garment.release();
+	m_garment = gar.m_garment.clone();
+	featureVector = gar.featureVector;
+}
+Garment&Garment::operator = (const Garment& gar){
+	if (!m_garment.empty()) m_garment.release();
+	m_garment = gar.m_garment.clone();
+	featureVector = gar.featureVector;
+	return *this;
+}
 Garment::~Garment(){
 
 }

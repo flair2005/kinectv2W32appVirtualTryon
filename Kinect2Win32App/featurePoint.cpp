@@ -11,6 +11,27 @@ featurePoint::~featurePoint()
 {
 
 }
+featurePoint::featurePoint(const featurePoint& fpt){
+
+}
+featurePoint& featurePoint:: operator = (const featurePoint& fpt){
+	if (!contours.empty()) contours.clear();
+	contours = fpt.contours;
+	if (!featurePt.empty()) featurePt.clear();
+	featurePt = fpt.featurePt;
+	if (!contoursPoint1.empty()) contoursPoint1.clear();
+	contoursPoint1 = fpt.contoursPoint1;
+	if (!contoursPoint2.empty()) contoursPoint2.clear();
+	contoursPoint2 = fpt.contoursPoint2;
+	if (!auxiliaryPoints.empty()) auxiliaryPoints.clear();
+	auxiliaryPoints = fpt.auxiliaryPoints;
+
+	threshval = fpt.threshval;
+	pointinterval = fpt.pointinterval;
+	M = fpt.M;
+
+	return *this;
+}
 
 void featurePoint::featurepointInit(){
 	contours.clear();

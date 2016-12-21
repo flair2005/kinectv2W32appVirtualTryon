@@ -43,7 +43,7 @@ CKinect::CKinect()
 
 	fpt = new featurePoint();
 	gmt = new Garment();
-	mdl = new Model();
+	//mdl = new Model();
 }
 CKinect::CKinect(const CKinect& kin){
 	/*m_pKinectSensor = NULL;
@@ -68,37 +68,78 @@ CKinect::CKinect(const CKinect& kin){
 	m_pDepthCoordinates = new DepthSpacePoint[cColorWidth * cColorHeight];
 
 	m_pDepthRGBX = new RGBQUAD[cDepthWidth * cDepthHeight];// create heap storage for color pixel data in RGBX format
-
-	*m_pOutputRGBX = *kin.m_pOutputRGBX;
-	*m_pBackgroundRGBX = *kin.m_pBackgroundRGBX;
-	*m_pColorRGBX = *kin.m_pColorRGBX;
-	*m_pDepthCoordinates = *kin.m_pDepthCoordinates;
-	*m_pDepthRGBX = *kin.m_pDepthRGBX;
 	*/
-	m_body = kin.m_body;
+	/*if (m_pOutputRGBX != NULL) delete m_pOutputRGBX;
+	m_pOutputRGBX = new RGBQUAD[cColorWidth * cColorHeight];
+	*m_pOutputRGBX = *kin.m_pOutputRGBX;
+
+	if (m_pBackgroundRGBX != NULL) delete m_pBackgroundRGBX;
+	m_pBackgroundRGBX = new RGBQUAD[cColorWidth * cColorHeight];
+	*m_pBackgroundRGBX = *kin.m_pBackgroundRGBX;
+
+	if (m_pColorRGBX != NULL) delete m_pColorRGBX;
+	m_pColorRGBX = new RGBQUAD[cColorWidth * cColorHeight];
+	*m_pColorRGBX = *kin.m_pColorRGBX;
+
+	if (m_pDepthCoordinates != NULL) delete m_pDepthCoordinates;
+	m_pDepthCoordinates = new DepthSpacePoint[cColorWidth * cColorHeight];
+	*m_pDepthCoordinates = *kin.m_pDepthCoordinates;
+
+	if (m_pDepthRGBX != NULL) delete m_pDepthRGBX;
+	m_pDepthRGBX = new RGBQUAD[cDepthWidth * cDepthHeight];
+	*m_pDepthRGBX = *kin.m_pDepthRGBX;*/
+	SAFE_RELEASE_VEC(m_pOutputRGBX);
+	SAFE_RELEASE_VEC(m_pBackgroundRGBX);
+	SAFE_RELEASE_VEC(m_pColorRGBX);
+	SAFE_RELEASE_VEC(m_pDepthCoordinates);
+	SAFE_RELEASE_VEC(m_pDepthRGBX);
+	if (!m_Depth.empty()) m_Depth.release();
+	m_Depth = kin.m_Depth.clone();
+	if (!m_Color.empty()) m_Color.release();
+	m_Color = kin.m_Color.clone();
+	if (!m_BodyIndex.empty()) m_BodyIndex.release();
+	m_BodyIndex = kin.m_BodyIndex.clone();
+	if (!m_body.empty()) m_body.release();
+	m_body = kin.m_body.clone();
+
+	if (fpt != NULL) SAFE_RELEASE( fpt);
+	fpt = new featurePoint;
+	*fpt = *kin.fpt;
+	if (gmt != NULL) delete gmt;
+	gmt = new Garment;
+	*gmt = *kin.gmt;
+	//if (mdl != NULL) delete mdl;
+	//mdl = new Model;
+	//*mdl = *kin.mdl;
+
+	/*m_Depth.create(cDepthHeight, cDepthWidth, CV_16UC1);
+	m_Color.create(cColorHeight, cColorWidth, CV_8UC4);
+	m_BodyIndex.create(cDepthHeight, cDepthWidth, CV_8UC1);
+	m_body = kin.m_body.clone();
 	contourRect = kin.contourRect;
-	m_Depth=kin.m_Depth;
-	m_Color; kin.m_Color;
-	m_BodyIndex=kin.m_BodyIndex;
+	m_Depth=kin.m_Depth.clone();
+	m_Color; kin.m_Color.clone();
+	m_BodyIndex=kin.m_BodyIndex.clone();
 	fpt=new featurePoint;
 	*fpt = *kin.fpt;
 	gmt=new Garment;
 	*gmt = *kin.gmt;
 	mdl=new Model;
-	*mdl = *kin.mdl;
+	*mdl = *kin.mdl;*/
 
 }
 
 CKinect& CKinect::operator = (const CKinect& kin){
+
 	if (fpt != NULL) delete fpt;
 	fpt = new featurePoint;
 	*fpt = *kin.fpt;
 	if (gmt != NULL) delete gmt;
 	gmt = new Garment;
 	*gmt = *kin.gmt;
-	if (mdl != NULL) delete mdl;
-	mdl = new Model;
-	*mdl = *kin.mdl;
+	//if (mdl != NULL) delete mdl;
+	//mdl = new Model;
+	//*mdl = *kin.mdl;
 
 	m_body = kin.m_body;
 	contourRect = kin.contourRect;
@@ -153,14 +194,14 @@ CKinect::~CKinect()
 	SafeRelease(m_pKinectSensor);
 	delete fpt;
 	delete gmt;
-	delete mdl;
+	//delete mdl;
 }
 
 
 HRESULT	CKinect::InitKinect(Model mod)
 {
-	mdl = &mod;
-	if (!mdl) return E_FAIL;
+	//mdl = &mod;
+	//if (!mdl) return E_FAIL;
 	HRESULT hr;
 
 	hr = GetDefaultKinectSensor(&m_pKinectSensor);
@@ -480,7 +521,7 @@ void CKinect::ProcessFrame(INT64 nTime,
 	Mat thpng;//二值图
 	Mat m_canny;
 	threshold(bodyIndex2, thpng, 170, 255, CV_THRESH_BINARY);
-	imshow("erzhitu", thpng);
+	//imshow("erzhitu", thpng);//二值图显示
 
 	//提取轮廓
 	//vector<vector<Point>>bodyContours;
@@ -488,10 +529,10 @@ void CKinect::ProcessFrame(INT64 nTime,
 	//drawContours(result, bodyContours, -1, Scalar(255, 0, 0), 5);
 	Canny(thpng, m_canny, 150, 220);
 	GaussianBlur(m_canny, m_canny, Size(9, 9), 0, 0);
-	imshow("lunkuo", m_canny);
+	//imshow("lunkuo", m_canny);//canny图显示
 	Mat m_fillHole;
 	fillHole(m_canny, m_fillHole);
-	imshow("fillHole", m_fillHole);
+	//imshow("fillHole", m_fillHole);//空洞填充图
 	Mat m_contours(m_canny.size(), CV_8U, Scalar(255));
 	vector<vector<cv::Point>>bodyContours;
 	findContours(m_fillHole, bodyContours, CV_RETR_CCOMP, CV_CHAIN_APPROX_NONE);
@@ -505,7 +546,7 @@ void CKinect::ProcessFrame(INT64 nTime,
 		cout << bodyContours[i].size()<<" -- ";
 	}
 	cout << endl;
-	imshow("drawcontours", m_contours);
+	//imshow("drawcontours", m_contours);//轮廓图显示
 	//for (int i = 0; i < nColorHeight*nColorWidth; i++) cout << m_pDepthCoordinates[i].X << "&&" << m_pDepthCoordinates[i].Y<<"  ";
 	//cout << endl;
 	//寻找彩色图中人体的点
@@ -592,7 +633,8 @@ void CKinect::ProcessFrame(INT64 nTime,
 		cout << "contourRect.size=" << contourRect.size() << endl;
 		m_body = showImage(contourRect);
 		Mat m_body2;
-		resize(m_body, m_body2, cv::Size(), 0.5, 0.5);
+		//resize(m_body, m_body2, cv::Size(), 0.5, 0.5);
+		resize(m_body, m_body2, cv::Size(), 1, 1);
 		imshow("bodybody", m_body2);
 		/*IplImage *bodyImage, *cpBodyImage;
 		bodyImage = &IplImage(showImage);

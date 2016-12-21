@@ -64,7 +64,7 @@ private:
 	Mat						m_BodyIndex;
 	featurePoint*           fpt;
 	Garment*                gmt;
-	Model*					mdl;
+	//Model*					mdl;
 
 };
 
