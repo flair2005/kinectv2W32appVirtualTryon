@@ -510,7 +510,7 @@ void CKinect::ProcessFrame(INT64 nTime,
 
 	//
 	//imshow("color2", m_Color);
-	Mat showImage;
+
 	//resize(m_Color, showImage, Size(cColorWidth / 2, cColorHeight / 2));
 	resize(m_Color, showImage, Size(cColorWidth, cColorHeight));
 	//imshow("Color", showImage);//
@@ -769,7 +769,7 @@ void CKinect::ProcessFrame(INT64 nTime,
 
 	Mat showImageResize;
 	resize(showImage, showImageResize, cv::Size(), 0.5, 0.5);
-	imshow("Color", showImageResize);
+	//imshow("Color", showImageResize);
 	RGBQUAD* pRGBX = m_pDepthRGBX;
 	// end pixel is start + width*height - 1
 	const UINT16* pBufferEnd = pDepthBuffer + (nDepthWidth * nDepthHeight);

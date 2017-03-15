@@ -20,6 +20,7 @@ public:
 	void getRectUser();
 	void getrectModel();
 	void getmGarment();
+	void connectGarUser(Mat m_gar,Mat m_user);
 	Model mod;
 	Garment gar;
 	CKinect kin;

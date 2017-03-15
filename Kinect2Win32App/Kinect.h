@@ -44,6 +44,10 @@ public:
 
 	Rect					contourRect;
 	Mat						m_body;
+	Mat						m_Depth;
+	Mat						m_Color;
+	Mat						m_BodyIndex;
+	Mat						showImage;
 
 private:
 	IKinectSensor*          m_pKinectSensor;// Current Kinect
@@ -59,9 +63,7 @@ private:
 
 	//IBody**					myBodyArr;//
 
-	Mat						m_Depth;
-	Mat						m_Color;
-	Mat						m_BodyIndex;
+
 	featurePoint*           fpt;
 	Garment*                gmt;
 	//Model*					mdl;

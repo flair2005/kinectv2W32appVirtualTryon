@@ -55,7 +55,7 @@ void Transfer::getmGarment(){
 	cout << "|m_garment_size|=>" << m_garment.size() << endl;
 }
 void Transfer::transComputing(){
-	//cout << "|kin_m_body_size|=>" << kin.contourRect.size() << "  |mod_m_body_size|=>" << mod.m_body.size() << endl;
+	//cout << "|kin_m_body_size|=>" << kin.m_Color.size() << "  |mod_m_body_size|=>" << mod.m_body.size() << endl;
 	//imshow("trans_m_body",mod.m_body);
 	getmUser();
 	getmModel();
@@ -69,13 +69,43 @@ void Transfer::transComputing(){
 	cout << "|m_model2_size|=>" << m_model2.size() << endl;
 	imshow("m_model2", m_model2);
 
-	Mat m_garment2(m_garment.size(),m_garment.type(),Scalar(255));
+	//Mat m_garment2(m_garment.size(),m_garment.type(),Scalar(255));
+	Mat m_garment2;
 	m_garment2 = m_garment(rect_model);
 	cout << "|m_garment2_size|=>" << m_garment2.size() << endl;
-	if (!m_garment2.empty()) {
-		//Mat m_garment3(m_garment.size(), m_garment.type(), Scalar(255));
-		//resize(m_garment2, m_garment3, cv::Size(), m_user.cols*1.0 / m_model.cols, m_user.rows*1.0 / m_model.rows);
+	Mat m_garment3(m_garment.size(), m_garment.type(), Scalar(255));
+	if (!m_garment2.empty() && !m_user.empty()) {
+		resize(m_garment2, m_garment3, cv::Size(), m_user.cols*1.0 / m_model.cols, m_user.rows*1.0 / m_model.rows);
 		//imshow("m_garment3", m_garment3);
-		imshow("m_garment2", m_garment2);
+		cout << "|m_garment3_size|=>" << m_garment3.size() << endl;
+
+		//imshow("m_garment2", m_garment2);
+		Mat temp;
+		threshold(m_garment3, temp, 200, 255, CV_THRESH_BINARY);
+		imshow("temp",temp);
+		//Mat mbodymask2;
+		Mat mbodymask(m_garment3.size(), CV_8UC1);
+		//bitwise_xor(temp, Scalar(255,255,255), mbodymask2);
+		//imshow("mbodymask2", mbodymask2);
+		cvtColor(temp, mbodymask, CV_BGR2GRAY);
+		imshow("mbodymask", mbodymask);
+		Mat m_test(m_garment3.size(), m_garment3.type());
+		m_user.copyTo(m_test, mbodymask);
+		imshow("m_user", m_test);
+		imshow("m_garment3", m_garment3);
+		Mat m_test2(m_garment3.size(), m_garment3.type());
+		//m_test.copyTo(m_garment3, mbodymask);
+		//imshow("m_user2", m_garment3);
+		//Mat mtest2 = m_garment3(mbodymask);
+		//add(m_user,m_garment3, m_test, mbodymask);
+		//bitwise_xor(m_garment3,m_test,m_test2);
+		//imshow("m_test",m_test2);
+		//cout << "|m_color_size|=>" << kin.m_Color.size() << endl;
+		//imshow("m_color",kin.m_Color);
+
+
 	}
+	
+
+
 }
