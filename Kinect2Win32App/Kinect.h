@@ -48,6 +48,7 @@ public:
 	Mat						m_Color;
 	Mat						m_BodyIndex;
 	Mat						showImage;
+	map<int, Point>          mapJoints;
 
 private:
 	IKinectSensor*          m_pKinectSensor;// Current Kinect

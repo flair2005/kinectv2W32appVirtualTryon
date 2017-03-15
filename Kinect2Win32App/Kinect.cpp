@@ -44,6 +44,8 @@ CKinect::CKinect()
 	fpt = new featurePoint();
 	gmt = new Garment();
 	//mdl = new Model();
+	if (!mapJoints.empty()) 
+		mapJoints.clear();
 }
 CKinect::CKinect(const CKinect& kin){
 	/*m_pKinectSensor = NULL;
@@ -108,6 +110,9 @@ CKinect::CKinect(const CKinect& kin){
 	if (gmt != NULL) delete gmt;
 	gmt = new Garment;
 	*gmt = *kin.gmt;
+	if (!mapJoints.empty()) mapJoints.clear();
+	mapJoints = kin.mapJoints;
+	//if (!mapJoints.empty()) mapJoints.clear();
 	//if (mdl != NULL) delete mdl;
 	//mdl = new Model;
 	//*mdl = *kin.mdl;
@@ -146,6 +151,9 @@ CKinect& CKinect::operator = (const CKinect& kin){
 	m_Depth = kin.m_Depth;
 	m_Color; kin.m_Color;
 	m_BodyIndex = kin.m_BodyIndex;
+
+	if (!mapJoints.empty()) mapJoints.clear();
+	mapJoints = kin.mapJoints;
 	/*
 	//m_pKinectSensor = new IKinectSensor;
 	// create heap storage for composite image pixel data in RGBX format
@@ -194,6 +202,9 @@ CKinect::~CKinect()
 	SafeRelease(m_pKinectSensor);
 	delete fpt;
 	delete gmt;
+
+	if (!mapJoints.empty()) 
+		mapJoints.clear();
 	//delete mdl;
 }
 
@@ -755,6 +766,7 @@ void CKinect::ProcessFrame(INT64 nTime,
 						int x = static_cast< int >(colorSpacePoint.X);
 						int y = static_cast< int >(colorSpacePoint.Y);
 						if ((x >= 0) && (x < cColorWidth) && (y >= 0) && (y < cColorHeight)){
+							mapJoints.insert(pair<int, Point>(type, Point(x, y)));
 							cv::circle(showImage,cv::Point(x, y), 5, Scalar(255,255,0), - 1, CV_AA);
 						}
 					}
