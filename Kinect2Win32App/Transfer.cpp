@@ -43,7 +43,7 @@ void Transfer::getmModel(){
 
 void Transfer::getrectModel(){
 	rect_model = mod.contourRect;
-	cout << "|rect_model_size|=>" << rect_model.size() << endl; 
+	cout << "|rect_model_size|=>" << rect_model.size() << endl;
 }
 void Transfer::getRectUser(){
 	rect_user = kin.contourRect;
@@ -54,6 +54,29 @@ void Transfer::getmGarment(){
 	m_garment = gar.m_garment;
 	cout << "|m_garment_size|=>" << m_garment.size() << endl;
 }
+Mat Transfer::combineMat(Mat x, Mat y, Mat mask){
+	Mat dst(x.size(), x.type());
+	for (int i = 0; i < x.rows; i++){
+		for (int j = 0; j < x.cols; j++){
+			if (mask.at<Vec3b>(i, j)[0] != 0 && mask.at<Vec3b>(i, j)[1] != 0 && mask.at<Vec3b>(i, j)[1] != 0){
+				dst.at<Vec3b>(i, j)[0] = x.at<Vec3b>(i, j)[0];
+				dst.at<Vec3b>(i, j)[1] = x.at<Vec3b>(i, j)[1];
+				dst.at<Vec3b>(i, j)[2] = x.at<Vec3b>(i, j)[2];
+			}
+			else{
+				dst.at<Vec3b>(i, j)[0] = y.at<Vec3b>(i, j)[0];
+				dst.at<Vec3b>(i, j)[1] = y.at<Vec3b>(i, j)[1];
+				dst.at<Vec3b>(i, j)[2] = y.at<Vec3b>(i, j)[2];
+			}
+		}
+	}
+	return dst;
+}
+
+Mat Transfer::positionCorrect(Point user_x, Point model_y, Mat garment){
+
+}
+
 void Transfer::transComputing(){
 	//cout << "|kin_m_body_size|=>" << kin.m_Color.size() << "  |mod_m_body_size|=>" << mod.m_body.size() << endl;
 	//imshow("trans_m_body",mod.m_body);
@@ -62,7 +85,7 @@ void Transfer::transComputing(){
 	getRectUser();
 	getrectModel();
 	getmGarment();
-	Mat m_model2(m_model.size(),m_model.type(),Scalar(255));
+	Mat m_model2(m_model.size(), m_model.type(), Scalar(255));
 	if (!m_user.empty()){
 		resize(m_model, m_model2, cv::Size(), m_user.cols*1.0 / m_model.cols, m_user.rows*1.0 / m_model.rows);
 	}
@@ -82,7 +105,7 @@ void Transfer::transComputing(){
 		//imshow("m_garment2", m_garment2);
 		Mat temp;
 		threshold(m_garment3, temp, 200, 255, CV_THRESH_BINARY);
-		imshow("temp",temp);
+		imshow("temp", temp);
 		//Mat mbodymask2;
 		Mat mbodymask(m_garment3.size(), CV_8UC1);
 		//bitwise_xor(temp, Scalar(255,255,255), mbodymask2);
@@ -91,9 +114,17 @@ void Transfer::transComputing(){
 		imshow("mbodymask", mbodymask);
 		Mat m_test(m_garment3.size(), m_garment3.type());
 		m_user.copyTo(m_test, mbodymask);
-		imshow("m_user", m_test);
+		imshow("m_test", m_test);
+		imshow("m_user2", m_user);
 		imshow("m_garment3", m_garment3);
 		Mat m_test2(m_garment3.size(), m_garment3.type());
+		m_test2 = combineMat(m_user, m_garment3, temp);
+		imshow("m_test2", m_test2);
+		/*Mat mbodymask2(m_garment3.size(), CV_8UC1);
+		bitwise_xor(mbodymask, Scalar(255), mbodymask2);
+		imshow("mbodymask2", mbodymask2);
+		m_test.copyTo(m_test2, mbodymask2);
+		imshow("m_test2", m_test2);
 		//m_test.copyTo(m_garment3, mbodymask);
 		//imshow("m_user2", m_garment3);
 		//Mat mtest2 = m_garment3(mbodymask);
@@ -101,11 +132,11 @@ void Transfer::transComputing(){
 		//bitwise_xor(m_garment3,m_test,m_test2);
 		//imshow("m_test",m_test2);
 		//cout << "|m_color_size|=>" << kin.m_Color.size() << endl;
-		//imshow("m_color",kin.m_Color);
+		//imshow("m_color",kin.m_Color);*/
 
 
 	}
-	
+
 
 
 }
