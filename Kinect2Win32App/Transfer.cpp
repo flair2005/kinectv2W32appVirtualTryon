@@ -140,6 +140,7 @@ void Transfer::transComputing(){
 	}
 	cout << "|m_model2_size|=>" << m_model2.size() << endl;
 	imshow("m_model2", m_model2);
+	mod.getFpt(m_model2);
 	//Mat m_garment2(m_garment.size(),m_garment.type(),Scalar(255));
 	Mat m_garment2;
 	m_garment2 = m_garment(rect_model);

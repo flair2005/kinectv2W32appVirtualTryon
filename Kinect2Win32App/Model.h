@@ -17,7 +17,10 @@ public:
 	featurePoint* fpt;
 	Rect contourRect;
 	Mat m_body;
-	Model& operator = (const Model&);
+	Model& operator = (const Model&);  
+	void getFpt(Mat src);
+
+	void changeRect(Rect & r, int change);
 private:
 	Mat m_model;
 };
