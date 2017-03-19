@@ -10,6 +10,8 @@ Model::Model(const Model& m){
 	*fpt=*(m.fpt);
 	contourRect = m.contourRect;
 	m_body = m.m_body;
+	modelSrc = m.modelSrc;
+	modelSrcRect = m.modelSrcRect;
 	//m_model = m.m_model;
 }
 Model::~Model(){
@@ -23,19 +25,20 @@ Model& Model:: operator = (const Model& m){
 	contourRect = m.contourRect;
 	m_body = m.m_body;
 	m_model = m.m_model.clone();
-
+	modelSrc = m.modelSrc.clone();
+	modelSrcRect = m.modelSrcRect;
 	return *this;
 }
 
 void Model::changeRect(Rect & r, int change){
-	r.x -= change;
-	r.y -= change;
-	r.width += change;
-	r.height += change;
+	//r = r + Size(change, change);
 }
 void Model::modelInitial(){
 	fpt->featurepointInit();
 	IplImage *plmgsrc = cvLoadImage("cccc.png");
+	modelSrc = Mat(plmgsrc);
+	modelSrcRect = Rect(0, 0, modelSrc.cols, modelSrc.rows);
+	
 
 	if (!plmgsrc->imageData)
 	{
@@ -73,7 +76,7 @@ void Model::modelInitial(){
 	//fpt->getBodyRegion(resulttemp, plmgsrc);
 	drawContours(src, contours, -1, Scalar(0, 0, 255, 0), 1);   // -1 表示所有轮廓
 	contourRect = boundingRect(fpt->contoursPoint1);
-	changeRect(contourRect, 20);
+	//changeRect(contourRect, 20);
 	rectangle(src,contourRect,Scalar(255,128,64),3);
 	imshow("src", src);/**/
 
@@ -88,7 +91,9 @@ void Model::modelInitial(){
 
 }
 
-void Model::getFpt(Mat src){
+void Model::getFpt(Mat src2){
+	Mat src;
+	src2 = src.clone();
 	fpt = new featurePoint();
 	fpt->featurepointInit();
 	IplImage *plmgsrc = &IplImage(src);

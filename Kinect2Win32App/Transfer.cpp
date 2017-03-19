@@ -12,9 +12,11 @@ void Transfer::transferInit(Model mod, Garment gar, CKinect kin){
 	this->mod = mod;
 	this->gar = gar;
 	this->kin = kin;
-	this->rect_model = mod.contourRect;
+	//this->rect_model = mod.contourRect;
+	this->rect_model = mod.modelSrcRect;
 	this->rect_user = kin.contourRect;
-	this->m_model = mod.m_body;
+	//this->m_model = mod.m_body;
+	this->m_model = mod.modelSrc;
 	this->m_user = kin.m_body;
 	this->m_garment = gar.m_garment;
 }
@@ -37,12 +39,15 @@ void Transfer::getmUser(){
 	cout << "|kin_m_body_size|=>" << m_user.size() <<"|kin_joints_size|=>"<<kin.mapJoints.size()<< endl;
 }
 void Transfer::getmModel(){
-	m_model = mod.m_body;
+	//m_model = mod.m_body;
+	m_model = mod.modelSrc;
+	imshow("modsrc", mod.modelSrc);
 	cout << "|model_m_body_size|=>" << m_model.size() << endl;
 }
 
 void Transfer::getrectModel(){
-	rect_model = mod.contourRect;
+	//rect_model = mod.contourRect;
+	rect_model = mod.modelSrcRect;
 	cout << "|rect_model_size|=>" << rect_model.size() << endl;
 }
 void Transfer::getRectUser(){
@@ -131,16 +136,17 @@ void Transfer::transComputing(){
 	//imshow("trans_m_body",mod.m_body);
 	getmUser();
 	getmModel();
+	imshow("m_model",mod.modelSrc);
 	getRectUser();
 	getrectModel();
 	getmGarment();
-	Mat m_model2(m_model.size(), m_model.type(), Scalar(255));
+	Mat m_model2(m_model.size(), m_model.type());
 	if (!m_user.empty()){
 		resize(m_model, m_model2, cv::Size(), m_user.cols*1.0 / m_model.cols, m_user.rows*1.0 / m_model.rows);
 	}
 	cout << "|m_model2_size|=>" << m_model2.size() << endl;
 	imshow("m_model2", m_model2);
-	mod.getFpt(m_model2);
+	//mod.getFpt(m_model2);
 	//Mat m_garment2(m_garment.size(),m_garment.type(),Scalar(255));
 	Mat m_garment2;
 	m_garment2 = m_garment(rect_model);

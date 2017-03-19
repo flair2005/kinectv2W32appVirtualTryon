@@ -21,6 +21,9 @@ public:
 	void getFpt(Mat src);
 
 	void changeRect(Rect & r, int change);
+
+	Mat modelSrc;
+	Rect modelSrcRect;
 private:
 	Mat m_model;
 };
