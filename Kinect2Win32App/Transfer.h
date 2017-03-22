@@ -23,11 +23,20 @@ public:
 	void connectGarUser(Mat m_gar,Mat m_user);
 	Point getPointUser_x();
 	Point getPointModel_y();
+	Point getNeckPFromMat(Mat garment);
 	Mat  combineMat(Mat x, Mat y, Mat mask);
 	Mat  positionCorrect(Point user_x,Point model_y,Mat garment);
 	Model mod;
 	Garment gar;
 	CKinect kin;
+
+	Rect getGarmentRect(Mat garment);
+	int getUserWidth();
+	int getUserHeight();
+	int getGarmentWidth(Mat mask);
+	int getGarmentHeight(Mat mask);
+	void fillHole(const Mat srcBw, Mat &dstBw);
+
 private:
 	Mat m_user;
 	Mat m_model;

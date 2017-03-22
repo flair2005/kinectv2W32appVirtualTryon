@@ -19,11 +19,13 @@ public:
 	Mat m_body;
 	Model& operator = (const Model&);  
 	void getFpt(Mat src);
-
+	void getFpt();
 	void changeRect(Rect & r, int change);
 
 	Mat modelSrc;
 	Rect modelSrcRect;
+	Mat cannyImage;
+	Mat fillholeImage;
 private:
 	Mat m_model;
 };

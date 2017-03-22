@@ -49,6 +49,12 @@ public:
 	Mat						m_BodyIndex;
 	Mat						showImage;
 	map<int, Point>          mapJoints;
+	int						neck_x;
+	int						neck_y;
+	Point                   shoulderLeft;
+	Point                   shoulderRight;
+	Point                   footRight;
+	Point                   footLeft;
 
 private:
 	IKinectSensor*          m_pKinectSensor;// Current Kinect

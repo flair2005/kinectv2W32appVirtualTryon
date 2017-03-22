@@ -40,6 +40,7 @@ void Transfer::getmUser(){
 }
 void Transfer::getmModel(){
 	//m_model = mod.m_body;
+	mod.modelInitial();
 	m_model = mod.modelSrc;
 	imshow("modsrc", mod.modelSrc);
 	cout << "|model_m_body_size|=>" << m_model.size() << endl;
@@ -59,10 +60,49 @@ void Transfer::getmGarment(){
 	m_garment = gar.m_garment;
 	cout << "|m_garment_size|=>" << m_garment.size() << endl;
 }
+
+int Transfer::getUserWidth(){
+	if (kin.shoulderRight.x != 1 && kin.shoulderRight.x != 1)
+		return abs(kin.shoulderRight.x - kin.shoulderLeft.x);
+	else
+		return kin.contourRect.width;
+}
+
+int Transfer::getUserHeight(){
+	if (kin.footLeft.y != 1 && kin.footLeft.y != 0 && kin.neck_y != 0)
+		return abs(kin.neck_y - kin.footLeft.y);
+	else
+		return kin.contourRect.height;
+}
+int Transfer::getGarmentHeight(Mat mask){
+	return 0;
+}
+int Transfer::getGarmentWidth(Mat mask){
+	int rownum = mask.rows;
+	int colnum = mask.cols;
+	int flag = false;
+	int left = 0;
+	int right = colnum;
+	for (int j = 0; j < colnum; j++){
+		if (!(mask.at<Vec3b>(rownum / 2, j)[0] && mask.at<Vec3b>(rownum / 2, j)[1] && mask.at<Vec3b>(rownum / 2, j)[2])){
+			left = j;
+			break;
+		}
+	}
+	for (int j = colnum-1; j >=0; j--){
+		if (!(mask.at<Vec3b>(rownum / 2, j)[0] && mask.at<Vec3b>(rownum / 2, j)[1] && mask.at<Vec3b>(rownum / 2, j)[2])){
+			right = j;
+			break;
+		}
+	}
+	return right-left;
+}
 Mat Transfer::combineMat(Mat x, Mat y, Mat mask){
 	Mat dst = x.clone();
-	for (int i = 0; i < x.rows; i++){
-		for (int j = 0; j < x.cols; j++){
+	int rownum = x.rows<y.rows?x.rows:y.rows;
+	int colnum = x.cols<y.cols?x.cols:y.cols;
+	for (int i = 0; i < rownum; i++){
+		for (int j = 0; j < colnum; j++){
 			//cout << "mask" << mask.at<Vec3b>(i, j)[0] << mask.at<Vec3b>(i, j)[1] << mask.at<Vec3b>(i, j)[2] << endl;
 			/*if (mask.at<Vec3b>(i, j)[0] == 255 && mask.at<Vec3b>(i, j)[1] == 255 && mask.at<Vec3b>(i, j)[2] == 255){
 				dst.at<Vec3b>(i, j)[0] = x.at<Vec3b>(i, j)[0];
@@ -87,8 +127,14 @@ Mat Transfer::combineMat(Mat x, Mat y, Mat mask){
 Point Transfer::getPointUser_x(){
 	Point user_x(0,0);
 	if (!kin.mapJoints.empty()){
-		user_x.x = kin.mapJoints[JointType_Neck].x - kin.contourRect.x;
-		user_x.y = kin.mapJoints[JointType_Neck].y - kin.contourRect.y;
+		cout << "jingdian 2:" << kin.mapJoints[JointType_Neck].x << "," << kin.mapJoints[JointType_Neck].y << endl;
+		cout << "jingdian 3:" << kin.neck_x << "," << kin.neck_y << endl;
+		//user_x.x = kin.mapJoints[JointType_Neck].x - kin.contourRect.x;
+		//user_x.y = kin.mapJoints[JointType_Neck].y - kin.contourRect.y;
+		user_x.x = kin.neck_x - kin.contourRect.x;
+		user_x.y = kin.neck_y - kin.contourRect.y;
+		circle(kin.m_body, user_x, 8, CV_RGB(255, 0, 0) ,- 1, 8, 0);
+		//circle(kin.m_Color, kin.mapJoints[JointType_Neck], 8, CV_RGB(255, 0, 0), -1, 8, 0);
 		//user_x.x = kin.mapJoints[JointType_Neck].x;
 		//user_x.y = kin.mapJoints[JointType_Neck].y;
 	}
@@ -97,12 +143,43 @@ Point Transfer::getPointUser_x(){
 Point Transfer::getPointModel_y(){
 	Point model_y(0, 0);
 	if (!mod.fpt->featurePt.empty()){
-		model_y.x = (mod.fpt->featurePt[0].x + mod.fpt->featurePt[26].x) / 2 - mod.contourRect.x;
-		model_y.y = (mod.fpt->featurePt[0].y + mod.fpt->featurePt[26].y) / 2 - mod.contourRect.y;
+		model_y.x = (mod.fpt->featurePt[0].x + mod.fpt->featurePt[26].x) / 2;
+			model_y.y = (mod.fpt->featurePt[0].y + mod.fpt->featurePt[26].y) / 2;
 		//model_y.x = (mod.fpt->featurePt[0].x + mod.fpt->featurePt[26].x) / 2;
 		//model_y.y = (mod.fpt->featurePt[0].y + mod.fpt->featurePt[26].y) / 2;
+		circle(mod.modelSrc, model_y, 8, CV_RGB(0, 255, 255), -1, 8, 0);
+		imshow("modelSrc2", mod.modelSrc);
 	}
 	return model_y;
+}
+
+Point Transfer::getNeckPFromMat(Mat mask){
+	int rownum = mask.rows;
+	int colnum = mask.cols;
+	Point first(0,0);
+	Point second(0,0);
+	bool flagfirst = false;
+	bool flagsec = false;
+	for (int i = 0; i < rownum; i++){
+		for (int j = 0; j < colnum; j++){
+			if (!(mask.at<Vec3b>(i, j)[0] && mask.at<Vec3b>(i, j)[1] && mask.at<Vec3b>(i, j)[2])){
+				if (!flagfirst){
+					flagfirst = true;
+					first.x = j;
+					first.y = i;
+				}
+				if (!flagsec && flagfirst){
+					if (abs(first.x - j)>5 && abs(first.y - i) < 5){
+						flagsec = true;
+						second.x = j;
+						second.y = i;
+					}
+				}
+			}
+			if (flagfirst && flagsec) return Point((first.x + second.x) / 2, (first.y + second.y) / 2);
+		}
+	}
+	return Point(0,0);
 }
 
 Mat Transfer::positionCorrect(Point user_x, Point model_y, Mat src){
@@ -111,7 +188,9 @@ Mat Transfer::positionCorrect(Point user_x, Point model_y, Mat src){
 	const int cols = src.cols;
 	int dx = user_x.x - model_y.x;
 	int dy = user_x.y - model_y.y;
-	dst.create(rows, cols, src.type());
+	int dstrows = src.rows + abs(dx);
+	int dstcols = src.cols + abs(dy);
+	dst.create(dstrows, dstcols, src.type());
 
 	Vec3b *p;
 	for (int i = 0; i < rows; i++)
@@ -120,8 +199,8 @@ Mat Transfer::positionCorrect(Point user_x, Point model_y, Mat src){
 		for (int j = 0; j < cols; j++)
 		{
 			//平移后坐标映射到原图像
-			int x = j + dx;
-			int y = i + dy;
+			int x = j - dx;
+			int y = i - dy;
 
 			//保证映射后的坐标在原图像范围内
 			if (x >= 0 && y >= 0 && x < cols && y < rows)
@@ -130,7 +209,39 @@ Mat Transfer::positionCorrect(Point user_x, Point model_y, Mat src){
 	}
 	return dst;
 }
+void Transfer::fillHole(const Mat srcBw, Mat &dstBw){
+	Size m_Size = srcBw.size();
+	Mat Temp = Mat::zeros(m_Size.height + 2, m_Size.width + 2, srcBw.type());//延展图像
+	srcBw.copyTo(Temp(Range(1, m_Size.height + 1), Range(1, m_Size.width + 1)));
 
+	cv::floodFill(Temp, Point(0, 0), Scalar(255));
+
+	Mat cutImg;//裁剪延展的图像
+	Temp(Range(1, m_Size.height + 1), Range(1, m_Size.width + 1)).copyTo(cutImg);
+
+	dstBw = srcBw | (~cutImg);
+}
+Rect Transfer::getGarmentRect(Mat garment){
+	Mat mgray;
+	Mat mcanny;
+	Mat mfillhole;
+	cvtColor(garment, mgray, CV_BGR2GRAY);
+	Canny(mgray, mcanny, 20, 200, 3);
+	fillHole(mcanny, mfillhole);
+
+	vector<vector<Point>> contours;
+	//if (!contours.empty()) contours.clear();
+	findContours(mfillhole, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_NONE);
+	Rect res;
+	res = boundingRect(contours[0]);
+	return res;
+	/*vector<vector<Point> > contours;
+	threshold(garment, temp, 200, 255, CV_THRESH_BINARY);
+	bitwise_xor(temp, Scalar(255,255,255), temp);
+	imshow("hanshutemp",temp);
+	findContours(temp, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_NONE);*/
+	
+}
 void Transfer::transComputing(){
 	//cout << "|kin_m_body_size|=>" << kin.m_Color.size() << "  |mod_m_body_size|=>" << mod.m_body.size() << endl;
 	//imshow("trans_m_body",mod.m_body);
@@ -146,20 +257,43 @@ void Transfer::transComputing(){
 	}
 	cout << "|m_model2_size|=>" << m_model2.size() << endl;
 	imshow("m_model2", m_model2);
-	//mod.getFpt(m_model2);
+	mod.getFpt();
 	//Mat m_garment2(m_garment.size(),m_garment.type(),Scalar(255));
 	Mat m_garment2;
 	m_garment2 = m_garment(rect_model);
 	cout << "|m_garment2_size|=>" << m_garment2.size() << endl;
 	Mat m_garment3(m_garment.size(), m_garment.type(), Scalar(255));
 	if (!m_garment2.empty() && !m_user.empty()) {
-		resize(m_garment2, m_garment3, cv::Size(), m_user.cols*1.0 / m_model.cols, m_user.rows*1.0 / m_model.rows);
+		//resize(m_garment2, m_garment3, cv::Size(), m_user.cols*1.0 / m_model.cols, m_user.rows*1.0 / m_model.rows);
+		m_garment3 = m_garment2.clone();
 		//imshow("m_garment3", m_garment3);
+		int userWidth = getUserHeight();
+		int userHeight = getUserWidth();
+		cout << "width height" << userWidth << "," << userHeight << endl;
+		Rect garmentRect = getGarmentRect(m_garment3);
+		int garmentHight = garmentRect.height;
+
+		Mat newm_garment = m_garment3(garmentRect);
+		imshow("newm_garment",newm_garment);
+		Mat newGarmentMask;
+		threshold(newm_garment, newGarmentMask, 200, 255, CV_THRESH_BINARY);
+
+		//int garmentWidth = getGarmentWidth(newGarmentMask);
+		int garmentWidth = garmentRect.width;
+		cout << "garmentWidth height" << garmentWidth << "," << garmentHight << endl;
+		Mat newm_garment2;
+		resize(newm_garment, newm_garment2, cv::Size(), userWidth*1.0 / garmentWidth, userHeight*1.0 / garmentHight);
+		imshow("newm_garment2", newm_garment2);
 		cout << "|m_garment3_size|=>" << m_garment3.size() << endl;
 		Point user_x = getPointUser_x();
+		cout << "|user_x-x,y|=>" << user_x.x<<","<<user_x.y << endl;
 		Point model_y = getPointModel_y();
+		cout << "|model_y-x,y|=>" << model_y.x << "," << model_y.y << endl;
+		//model_y.x *= m_user.cols*1.0 / m_model.cols;
+		//model_y.y *= m_user.rows*1.0 / m_model.rows;
 		Mat m_garment4(m_garment3.size(), m_garment3.type());
 		m_garment4 = positionCorrect(user_x,model_y,m_garment3);
+		circle(m_garment4, model_y,8, CV_RGB(0, 255, 255), -1, 8, 0);
 		imshow("m_garment4", m_garment4);
 		cout << "|m_garment4_size|=>" << m_garment4.size() << endl;
 		Mat temp;

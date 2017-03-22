@@ -25,7 +25,6 @@ int main()
 		tra.getKinect(kinect);
 		tra.getGarment(gar);
 		tra.transComputing();
-
 	}
 
 	return 0;

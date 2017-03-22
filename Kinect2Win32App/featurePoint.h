@@ -84,8 +84,8 @@ public:
 	vector<vector<Point>> getMaxSizeContours(vector<vector<Point>> &contours);
 	void getBodyContoursPoint(vector<vector<Point>> &contours);
 	//vector<Point> getBodyContoursPoint(vector<vector<Point>> &contours);
-	void getCircle200(IplImage *srcBw, vector<Point> &contours);
-	void getSpecialPoint27(IplImage *srcBw, vector<Point>&contoursPoint);
+	void getCircle200(Mat srcBw, vector<Point> &contours);
+	void getSpecialPoint27(Mat srcBw, vector<Point>&contoursPoint);
 	int getRegion(Point p);
 	void getBodyRegion(Mat& pic, IplImage *srcBw);
 	void getUpGarmentRegion(Mat& upgarment, Mat srcBw);

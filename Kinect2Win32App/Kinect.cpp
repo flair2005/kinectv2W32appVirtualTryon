@@ -44,8 +44,14 @@ CKinect::CKinect()
 	fpt = new featurePoint();
 	gmt = new Garment();
 	//mdl = new Model();
-	if (!mapJoints.empty()) 
+	if (!mapJoints.empty())
 		mapJoints.clear();
+	neck_x = 0;
+	neck_x = 0;
+	shoulderLeft =Point(1,1);
+	shoulderRight = Point(1, 1);
+	footRight = Point(1, 1);
+	footLeft = Point(1, 1);
 }
 CKinect::CKinect(const CKinect& kin){
 	/*m_pKinectSensor = NULL;
@@ -104,7 +110,7 @@ CKinect::CKinect(const CKinect& kin){
 	if (!m_body.empty()) m_body.release();
 	m_body = kin.m_body.clone();
 
-	if (fpt != NULL) SAFE_RELEASE( fpt);
+	if (fpt != NULL) SAFE_RELEASE(fpt);
 	fpt = new featurePoint;
 	*fpt = *kin.fpt;
 	if (gmt != NULL) delete gmt;
@@ -112,6 +118,12 @@ CKinect::CKinect(const CKinect& kin){
 	*gmt = *kin.gmt;
 	if (!mapJoints.empty()) mapJoints.clear();
 	mapJoints = kin.mapJoints;
+	neck_x = kin.neck_x;
+	neck_y = kin.neck_y;
+	shoulderLeft = kin.shoulderLeft;
+	shoulderRight = kin.shoulderRight;
+	footRight = kin.footRight;
+	footLeft = kin.footLeft;
 	//if (!mapJoints.empty()) mapJoints.clear();
 	//if (mdl != NULL) delete mdl;
 	//mdl = new Model;
@@ -154,6 +166,13 @@ CKinect& CKinect::operator = (const CKinect& kin){
 
 	if (!mapJoints.empty()) mapJoints.clear();
 	mapJoints = kin.mapJoints;
+
+	neck_x = kin.neck_x;
+	neck_y = kin.neck_y;
+	shoulderLeft = kin.shoulderLeft;
+	shoulderRight = kin.shoulderRight;
+	footRight = kin.footRight;
+	footLeft = kin.footLeft;
 	/*
 	//m_pKinectSensor = new IKinectSensor;
 	// create heap storage for composite image pixel data in RGBX format
@@ -203,7 +222,7 @@ CKinect::~CKinect()
 	delete fpt;
 	delete gmt;
 
-	if (!mapJoints.empty()) 
+	if (!mapJoints.empty())
 		mapJoints.clear();
 	//delete mdl;
 }
@@ -218,6 +237,7 @@ HRESULT	CKinect::InitKinect(Model mod)
 	hr = GetDefaultKinectSensor(&m_pKinectSensor);
 	if (FAILED(hr))
 	{
+		cout << "wrong kinect sensor";
 		return hr;
 	}
 
@@ -237,7 +257,7 @@ HRESULT	CKinect::InitKinect(Model mod)
 				FrameSourceTypes::FrameSourceTypes_Depth | FrameSourceTypes::FrameSourceTypes_Color | FrameSourceTypes::FrameSourceTypes_Body | FrameSourceTypes::FrameSourceTypes_BodyIndex,
 				&m_pMultiSourceFrameReader);
 
-//			hr = m_pKinectSensor->OpenMultiSourceFrameReader(FrameSourceTypes::FrameSourceTypes_Color ,	&m_pMultiSourceFrameReader);
+			//			hr = m_pKinectSensor->OpenMultiSourceFrameReader(FrameSourceTypes::FrameSourceTypes_Color ,	&m_pMultiSourceFrameReader);
 		}
 	}
 
@@ -441,9 +461,9 @@ void CKinect::Update()
 		if (SUCCEEDED(hr))
 		{
 			ProcessFrame(nDepthTime, pDepthBuffer, nDepthWidth, nDepthHeight, nDepthMinReliableDistance, nDepthMaxDistance,
-						 pColorBuffer, nColorWidth, nColorHeight,
-						 BODY_COUNT, ppBodies,
-						 pBodyIndexBuffer, nBodyIndexWidth, nBodyIndexHeight);
+				pColorBuffer, nColorWidth, nColorHeight,
+				BODY_COUNT, ppBodies,
+				pBodyIndexBuffer, nBodyIndexWidth, nBodyIndexHeight);
 		}
 
 		SafeRelease(pDepthFrameDescription);
@@ -464,10 +484,10 @@ void CKinect::Update()
 }
 
 void CKinect::ProcessFrame(INT64 nTime,
-						   const UINT16* pDepthBuffer, int nDepthWidth, int nDepthHeight, USHORT nMinDepth, USHORT nMaxDepth,
-						   const RGBQUAD* pColorBuffer, int nColorWidth, int nColorHeight,
-						   int nBodyCount, IBody** ppBodies,
-						   const BYTE* pBodyIndexBuffer, int nBodyIndexWidth, int nBodyIndexHeight)
+	const UINT16* pDepthBuffer, int nDepthWidth, int nDepthHeight, USHORT nMinDepth, USHORT nMaxDepth,
+	const RGBQUAD* pColorBuffer, int nColorWidth, int nColorHeight,
+	int nBodyCount, IBody** ppBodies,
+	const BYTE* pBodyIndexBuffer, int nBodyIndexWidth, int nBodyIndexHeight)
 {
 	LARGE_INTEGER qpcNow = { 0 };
 	WCHAR szStatusMessage[64];
@@ -485,7 +505,7 @@ void CKinect::ProcessFrame(INT64 nTime,
 		{
 			return;
 		}
-		
+
 		// loop over output pixels
 		for (int colorIndex = 0; colorIndex < (nColorWidth*nColorHeight); ++colorIndex)
 		{
@@ -517,7 +537,7 @@ void CKinect::ProcessFrame(INT64 nTime,
 		}
 	}//确保参数都准确
 
-	
+
 
 	//
 	//imshow("color2", m_Color);
@@ -549,12 +569,12 @@ void CKinect::ProcessFrame(INT64 nTime,
 	findContours(m_fillHole, bodyContours, CV_RETR_CCOMP, CV_CHAIN_APPROX_NONE);
 	getSizeContours(bodyContours);
 	vector<Point>contours = getBodyContoursPoint(bodyContours);
-	drawContours(m_contours, bodyContours, -1, CV_RGB(0,0,0), 2);
-	cout << bodyContours.size() <<": ";
+	drawContours(m_contours, bodyContours, -1, CV_RGB(0, 0, 0), 2);
+	cout << bodyContours.size() << ": ";
 	//cout << showImage.size() << endl;
 
 	for (int i = 0; i < bodyContours.size(); i++){
-		cout << bodyContours[i].size()<<" -- ";
+		cout << bodyContours[i].size() << " -- ";
 	}
 	cout << endl;
 	//imshow("drawcontours", m_contours);//轮廓图显示
@@ -568,24 +588,24 @@ void CKinect::ProcessFrame(INT64 nTime,
 		cout << tPoint.X << "%%" << tPoint.Y << endl;
 		if (tPoint.X >= 0 && tPoint.X < nDepthWidth && tPoint.Y >= 0 && tPoint.Y < nDepthHeight)  //判断是否合法
 		{
-			int index = (int)tPoint.Y * nDepthWidth + (int)tPoint.X; //取得彩色图上那点对应在BodyIndex里的值(注意要强转)
-			if (pBodyIndexBuffer[index] != 0xff)                   //如果判断出彩色图上某点是人体，就用它来替换背景图上对应的点
-			{
-				ColorSpacePoint colorPoint;
-				HRESULT hr = m_pCoordinateMapper->MapDepthPointToColorSpace(tPoint, (UINT16)100, &colorPoint);
-				if (SUCCEEDED(hr)){
-					int colorX = static_cast<int>(colorPoint.X + 0.5f);
-					int colorY = static_cast<int>(colorPoint.Y + 0.5f);
-					cout << "colorclor" << colorX << ":" << colorY << endl;
-					circle(showImage, Point(colorX, colorY), 8, CV_RGB(255, 0, 0), -1, 8, 0);
-				}
-			}
+		int index = (int)tPoint.Y * nDepthWidth + (int)tPoint.X; //取得彩色图上那点对应在BodyIndex里的值(注意要强转)
+		if (pBodyIndexBuffer[index] != 0xff)                   //如果判断出彩色图上某点是人体，就用它来替换背景图上对应的点
+		{
+		ColorSpacePoint colorPoint;
+		HRESULT hr = m_pCoordinateMapper->MapDepthPointToColorSpace(tPoint, (UINT16)100, &colorPoint);
+		if (SUCCEEDED(hr)){
+		int colorX = static_cast<int>(colorPoint.X + 0.5f);
+		int colorY = static_cast<int>(colorPoint.Y + 0.5f);
+		cout << "colorclor" << colorX << ":" << colorY << endl;
+		circle(showImage, Point(colorX, colorY), 8, CV_RGB(255, 0, 0), -1, 8, 0);
 		}
-	}*/
+		}
+		}
+		}*/
 	//寻找彩色图中人体的点
 	//寻找彩色图中人体的点
 	cout << nColorWidth << "||" << nColorHeight << endl;
-	Mat m_bg(nColorHeight, nColorWidth, CV_8UC1,Scalar(0));
+	Mat m_bg(nColorHeight, nColorWidth, CV_8UC1, Scalar(0));
 	vector<Point>::iterator it;
 	for (int i = 0; i < nColorHeight; ++i){
 		for (int j = 0; j < nColorWidth; ++j){
@@ -608,7 +628,7 @@ void CKinect::ProcessFrame(INT64 nTime,
 		}
 	}
 	cout << m_bg.size() << endl;
-	imshow("bg",m_bg);
+	//imshow("bg",m_bg);
 	/*Mat userThpng;
 	threshold(m_bg, userThpng, 200, 255, CV_THRESH_BINARY);
 	Mat m_userCanny;
@@ -620,27 +640,27 @@ void CKinect::ProcessFrame(INT64 nTime,
 	vector<vector<Point>>userContoursPoints;
 	userContoursPoints.clear();
 	findContours(m_bg, userContoursPoints, CV_RETR_CCOMP, CV_CHAIN_APPROX_NONE);
-	Mat m_userContours(m_bg.size(), CV_8U,Scalar(255));
-	drawContours(m_userContours, userContoursPoints, -1, CV_RGB(0, 0, 0), 2); 
-	imshow("userContours",m_userContours);
+	Mat m_userContours(m_bg.size(), CV_8U, Scalar(255));
+	drawContours(m_userContours, userContoursPoints, -1, CV_RGB(0, 0, 0), 2);
+	imshow("userContours", m_userContours);
 	vector<Point>userContour;
 	userContour = getBodyContoursPoint(userContoursPoints);
 	for (int i = 0; i < userContour.size(); i++){
 		circle(showImage, Point(userContour[i].x, userContour[i].y), 5, CV_RGB(255, 255, 0), -1, 8, 0);
 	}
-	
+
 
 	fpt->featurepointInit();
 	IplImage *IPLshowImage;
 	IPLshowImage = &IplImage(showImage);
 	fpt->getCircle200(IPLshowImage, userContour);
-	cout << "contoursPoint2.size()="<<fpt->contoursPoint2.size() << endl;
+	cout << "contoursPoint2.size()=" << fpt->contoursPoint2.size() << endl;
 	vector<Point>tempp = fpt->contoursPoint2;
 	cout << "tempp.size()=" << tempp.size() << endl;
 	fpt->getSpecialPoint27(IPLshowImage, tempp);
 	if (userContour.size()){
 		contourRect = boundingRect(userContour);
-		rectangle(showImage,contourRect,Scalar(255,128,64));
+		rectangle(showImage, contourRect, Scalar(255, 128, 64));
 		cout << "contourRect.size=" << contourRect.size() << endl;
 		m_body = showImage(contourRect);
 		Mat m_body2;
@@ -673,40 +693,40 @@ void CKinect::ProcessFrame(INT64 nTime,
 	//if (SUCCEEDED(hr)){
 	/*for (int i = 0; i < bodyContours.size(); i++){
 		for (int j = 0; j < bodyContours[i].size(); j++){
-			//circle(showImage,Point(i,j),5,CV_RGB(0,255,0),-1,8,0);
-			circle(showImage, Point(bodyContours[i][j].x* showImage.cols*1.0 / cDepthWidth, bodyContours[i][j].y * showImage.rows*1.0 / cDepthHeight), 5, CV_RGB(0, 255, 0), -1, 8, 0);
-			//cout << "contoursPoint"<<bodyContours[i][j];
-			//ColorSpacePoint *colorSpacePoint = NULL;
-			//DepthSpacePoint depthSpacePoint = { bodyContours[i][j].x, bodyContours[i][j].y };
-			//cout << "深度图的点：" << bodyContours[i][j].x<< bodyContours[i][j].y<<endl;
-			//UINT16 depth = pDepthBuffer[bodyContours[i][j].y * cDepthWidth + bodyContours[i][j].x];*/
-			/*HRESULT hr = m_pCoordinateMapper->MapDepthPointsToColorSpace(nColorWidth*nColorHeight, m_pDepthCoordinates, cDepthWidth*cDepthHeight, (UINT16*)pDepthBuffer, nDepthWidth*nDepthHeight, colorSpacePoint);
-			if (SUCCEEDED(hr)){
-				int pos = bodyContours[i][j].y * nColorWidth + bodyContours[i][j].x;
-				int x = colorSpacePoint[pos].X;
-				int y = colorSpacePoint[pos].Y;
-				//circle(showImage, Point(x, y), 3, CV_RGB(0, 255, 0), -1, 8, 0);
-				cout << "lunkuodian:" << x << y << endl;
-				circle(showImage, Point(x, y), 3, CV_RGB(0, 255, 0), -1, 8, 0);
-			}
-			int pos = bodyContours[i][j].y * cColorWidth + bodyContours[i][j].x;//像素点在一维序列中的位置。
-			int x = colorPoint[pos].X;
-			int y = colorPoint[pos].Y;
-			circle(showImage, Point(x,y), 3, CV_RGB(0, 255, 0), -1, 8, 0);*/
-			/*DepthSpacePoint depthSpacePoint;
-			depthSpacePoint.X = bodyContours[i][j].x;
-			depthSpacePoint.Y = bodyContours[i][j].y;
-			ColorSpacePoint colorSpacePoint;
-			UINT16 depth = findDepthBuffer(depthSpacePoint, nDepthWidth*nDepthHeight, pDepthBuffer);
-			cout << "depth=" << depth << endl;
-			HRESULT hr = m_pCoordinateMapper->MapDepthPointToColorSpace(depthSpacePoint, depth, &colorSpacePoint);
-			if (SUCCEEDED(hr)){
-				Point temp;
-				temp.x = static_cast<int>(colorSpacePoint.X);
-				temp.y = static_cast<int>(colorSpacePoint.X);
-				circle(showImage, temp, 5, CV_RGB(255, 0, 0), -1, 8, 0);
-			}
-		}
+		//circle(showImage,Point(i,j),5,CV_RGB(0,255,0),-1,8,0);
+		circle(showImage, Point(bodyContours[i][j].x* showImage.cols*1.0 / cDepthWidth, bodyContours[i][j].y * showImage.rows*1.0 / cDepthHeight), 5, CV_RGB(0, 255, 0), -1, 8, 0);
+		//cout << "contoursPoint"<<bodyContours[i][j];
+		//ColorSpacePoint *colorSpacePoint = NULL;
+		//DepthSpacePoint depthSpacePoint = { bodyContours[i][j].x, bodyContours[i][j].y };
+		//cout << "深度图的点：" << bodyContours[i][j].x<< bodyContours[i][j].y<<endl;
+		//UINT16 depth = pDepthBuffer[bodyContours[i][j].y * cDepthWidth + bodyContours[i][j].x];*/
+	/*HRESULT hr = m_pCoordinateMapper->MapDepthPointsToColorSpace(nColorWidth*nColorHeight, m_pDepthCoordinates, cDepthWidth*cDepthHeight, (UINT16*)pDepthBuffer, nDepthWidth*nDepthHeight, colorSpacePoint);
+	if (SUCCEEDED(hr)){
+	int pos = bodyContours[i][j].y * nColorWidth + bodyContours[i][j].x;
+	int x = colorSpacePoint[pos].X;
+	int y = colorSpacePoint[pos].Y;
+	//circle(showImage, Point(x, y), 3, CV_RGB(0, 255, 0), -1, 8, 0);
+	cout << "lunkuodian:" << x << y << endl;
+	circle(showImage, Point(x, y), 3, CV_RGB(0, 255, 0), -1, 8, 0);
+	}
+	int pos = bodyContours[i][j].y * cColorWidth + bodyContours[i][j].x;//像素点在一维序列中的位置。
+	int x = colorPoint[pos].X;
+	int y = colorPoint[pos].Y;
+	circle(showImage, Point(x,y), 3, CV_RGB(0, 255, 0), -1, 8, 0);*/
+	/*DepthSpacePoint depthSpacePoint;
+	depthSpacePoint.X = bodyContours[i][j].x;
+	depthSpacePoint.Y = bodyContours[i][j].y;
+	ColorSpacePoint colorSpacePoint;
+	UINT16 depth = findDepthBuffer(depthSpacePoint, nDepthWidth*nDepthHeight, pDepthBuffer);
+	cout << "depth=" << depth << endl;
+	HRESULT hr = m_pCoordinateMapper->MapDepthPointToColorSpace(depthSpacePoint, depth, &colorSpacePoint);
+	if (SUCCEEDED(hr)){
+	Point temp;
+	temp.x = static_cast<int>(colorSpacePoint.X);
+	temp.y = static_cast<int>(colorSpacePoint.X);
+	circle(showImage, temp, 5, CV_RGB(255, 0, 0), -1, 8, 0);
+	}
+	}
 	}*/
 	//}
 	//骨骼信息
@@ -763,11 +783,32 @@ void CKinect::ProcessFrame(INT64 nTime,
 					ColorSpacePoint colorSpacePoint = { 0 };
 					hr = m_pCoordinateMapper->MapCameraPointToColorSpace(joint[type].Position, &colorSpacePoint);
 					if (SUCCEEDED(hr)){
-						int x = static_cast< int >(colorSpacePoint.X);
-						int y = static_cast< int >(colorSpacePoint.Y);
+						int x = static_cast<int>(colorSpacePoint.X);
+						int y = static_cast<int>(colorSpacePoint.Y);
 						if ((x >= 0) && (x < cColorWidth) && (y >= 0) && (y < cColorHeight)){
-							mapJoints.insert(pair<int, Point>(type, Point(x, y)));
-							cv::circle(showImage,cv::Point(x, y), 5, Scalar(255,255,0), - 1, CV_AA);
+							mapJoints.insert(pair<int, cv::Point>(type, Point(x, y)));
+							if (type == JointType_Neck)
+								cout << "mapJoints_Neck:" << mapJoints[type].x << ",," << mapJoints[type].y << endl;
+							cv::circle(showImage, cv::Point(x, y), 5, Scalar(255, 255, 0), -1, CV_AA);
+
+							if (type == JointType_Neck){
+								cv::circle(showImage, cv::Point(x, y), 8, Scalar(0, 255, 255), -1, CV_AA);
+								neck_x = x;
+								neck_y = y;
+								cout << "jingdian -x-y" << x << "," << y << endl;
+							}
+							else if (type == JointType_FootLeft){
+								footLeft = Point(x, y);
+							}
+							else if (type == JointType_FootRight){
+								footRight = Point(x, y);
+							}
+							else if (type == JointType_ShoulderLeft){
+								shoulderLeft = Point(x, y);
+							}
+							else if (type == JointType_ShoulderRight){
+								shoulderRight = Point(x, y);
+							}
 						}
 					}
 				}
@@ -775,13 +816,13 @@ void CKinect::ProcessFrame(INT64 nTime,
 		}
 		//resize(m_Color, showImage, cv::Size(),0.5,0.5);
 	}
-	
+
 	cout << endl;
 	//imshow("Color", showImage);
 
 	Mat showImageResize;
 	resize(showImage, showImageResize, cv::Size(), 0.5, 0.5);
-	//imshow("Color", showImageResize);
+	imshow("Color", showImageResize);
 	RGBQUAD* pRGBX = m_pDepthRGBX;
 	// end pixel is start + width*height - 1
 	const UINT16* pBufferEnd = pDepthBuffer + (nDepthWidth * nDepthHeight);
@@ -871,6 +912,6 @@ vector<Point>  CKinect::getBodyContoursPoint(vector<vector<Point>> &contours)
 
 void CKinect::deformation(){
 	//cout << mdl->fpt->featurePt.size() << "|model|" << mdl->fpt->auxiliaryPoints.size() << endl;
-	cout << fpt->featurePt.size() << "|kinect|"<<fpt->auxiliaryPoints.size()<<endl;
+	cout << fpt->featurePt.size() << "|kinect|" << fpt->auxiliaryPoints.size() << endl;
 	//imshow("defor_color", m_Color);
 }
