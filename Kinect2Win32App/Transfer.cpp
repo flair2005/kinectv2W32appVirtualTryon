@@ -272,7 +272,9 @@ void Transfer::transComputing(){
 		cout << "width height" << userWidth << "," << userHeight << endl;
 		Rect garmentRect = getGarmentRect(m_garment3);
 		int garmentHight = garmentRect.height;
-
+		/*
+		20170323    step2
+		*/
 		Mat newm_garment = m_garment3(garmentRect);
 		imshow("newm_garment",newm_garment);
 		Mat newGarmentMask;
