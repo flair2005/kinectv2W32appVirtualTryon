@@ -42,19 +42,58 @@ public:
 	
 	void					deformation();
 
+
+	void					transferInit(Model mod, Garment gar);
+	void					transComputing(Mat& m_user);
+	void					getModel(Model model);
+	void					getGarment(Garment garment);
+	void					getmModel();
+	void					getrectModel();
+	void					getmGarment();
+	void					connectGarUser(Mat m_gar, Mat m_user);
+	Point					getPointUser_x();
+	Point					getPointModel_y();
+	Point					getNeckPFromMat(Mat garment);
+	Mat						combineMat(Mat x, Mat y, Mat mask);
+	Mat						positionCorrect(Point user_x, Point model_y, Mat src);
+
+	Rect					getGarmentRect(Mat garment);
+	int						getUserWidth();
+	int						getUserHeight();
+	int						getGarmentWidth(Mat mask);
+	int						getGarmentHeight(Mat mask);
+	//void fillHole(const Mat srcBw, Mat &dstBw);
+	void					combineGarmentAndBody(Mat& user, Mat& garment, Point bodyNeck, Point garmentNeck, Mat mask_garment);
+
+
 	Rect					contourRect;
 	Mat						m_body;
 	Mat						m_Depth;
 	Mat						m_Color;
 	Mat						m_BodyIndex;
 	Mat						showImage;
-	map<int, Point>          mapJoints;
+	//map<int, Point>          mapJoints;
 	int						neck_x;
 	int						neck_y;
+	Point					neck;
 	Point                   shoulderLeft;
 	Point                   shoulderRight;
 	Point                   footRight;
 	Point                   footLeft;
+	Point                   ankleLeft;
+	Point                   ankleRight;
+	int						ankleLeft_x;
+	int						ankleLeft_y;
+	int						ankleRight_x;
+	int						ankleRight_y;
+	int						shoulderLeft_x;
+	int						shoulderLeft_y;
+	int						shoulderRight_x;
+	int						shoulderRight_y;
+
+
+	Garment                 gar;
+	Model                   mod;
 
 private:
 	IKinectSensor*          m_pKinectSensor;// Current Kinect
@@ -73,6 +112,12 @@ private:
 
 	featurePoint*           fpt;
 	Garment*                gmt;
+
+	//Mat m_user;
+	Mat m_model;
+	Rect rect_user;
+	Rect rect_model;
+	Mat m_garment;
 	//Model*					mdl;
 
 };

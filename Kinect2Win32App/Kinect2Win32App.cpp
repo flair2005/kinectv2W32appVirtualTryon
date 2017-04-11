@@ -15,16 +15,18 @@ int main()
 	mod.modelInitial();
 	CKinect kinect;
 	kinect.InitKinect(mod);
-	Transfer tra;
-	tra.getModel(mod);
+	kinect.getGarment(gar);
+	kinect.getModel(mod);
+	//Transfer tra;
+	//tra.getModel(mod);
 	//cout << "mod.contourRect.size="<<mod.contourRect.size() << endl;
 	//system("pause");
 	while(1)
 	{
 		kinect.Update();
-		tra.getKinect(kinect);
-		tra.getGarment(gar);
-		tra.transComputing();
+		//tra.getKinect(kinect);
+		//tra.getGarment(gar);
+		//tra.transComputing();
 	}
 
 	return 0;
