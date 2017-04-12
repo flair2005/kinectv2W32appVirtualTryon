@@ -41,6 +41,7 @@ CKinect::CKinect()
 	m_Color.create(cColorHeight, cColorWidth, CV_8UC4);
 	m_BodyIndex.create(cDepthHeight, cDepthWidth, CV_8UC1);
 
+
 	fpt = new featurePoint();
 	gmt = new Garment();
 	//mdl = new Model();
@@ -796,7 +797,7 @@ void CKinect::ProcessFrame(INT64 nTime,
 							//mapJoints.insert(pair<int, cv::Point>(type, Point(x, y)));
 							//if (type == JointType_Neck)
 								//cout << "mapJoints_Neck:" << mapJoints[type].x << ",," << mapJoints[type].y << endl;
-							cv::circle(showImage, cv::Point(x, y), 5, Scalar(255, 255, 0), -1, CV_AA);
+							//cv::circle(showImage, cv::Point(x, y), 5, Scalar(255, 255, 0), -1, CV_AA);
 
 							if (type == JointType_Neck){
 								//cv::circle(showImage, cv::Point(x, y), 8, Scalar(0, 255, 255), -1, CV_AA);
@@ -822,14 +823,14 @@ void CKinect::ProcessFrame(INT64 nTime,
 								shoulderRight = Point(x, y);
 							}
 							else if (type == JointType_AnkleLeft){
-								cv::circle(showImage, cv::Point(x, y), 8, Scalar(0, 255, 255), -1, CV_AA);
+								//cv::circle(showImage, cv::Point(x, y), 8, Scalar(0, 255, 255), -1, CV_AA);
 								cout << "find ankleLeft" << endl; 
 								ankleLeft = Point(x, y);
 								ankleLeft_x = x;
 								ankleLeft_y = y;
 							}
 							else if (type == JointType_AnkleRight){
-								cv::circle(showImage, cv::Point(x, y), 8, Scalar(0, 255, 128), -1, CV_AA);
+								//cv::circle(showImage, cv::Point(x, y), 8, Scalar(0, 255, 128), -1, CV_AA);
 								cout << "find ankleRight" << endl;
 								ankleRight = Point(x, y);
 								ankleRight_x = x;
@@ -875,7 +876,7 @@ void CKinect::ProcessFrame(INT64 nTime,
 
 
 	Mat showImageResize;
-	resize(showImage, showImageResize, cv::Size(), 0.5, 0.5);
+	resize(showImage, showImageResize, cv::Size(), 1, 1);
 	imshow("Color", showImageResize);
 	RGBQUAD* pRGBX = m_pDepthRGBX;
 	// end pixel is start + width*height - 1
@@ -1041,12 +1042,12 @@ void CKinect::transComputing(Mat& m_user){
 		cout << "mask_newm_garment.size()" << mask_newm_garment.size() << endl;
 		cout << "outside function" << m_user.size() << newm_garment2.size() << mask_newm_garment.size() << endl;
 
+		//combineGarmentAndBody(m_user, newm_garment2, user_neck, newGarmentNeckPoint1, mask_newm_garment);
 		combineGarmentAndBody(m_user, newm_garment2, user_neck, newGarmentNeckPoint1, mask_newm_garment);
-
 
 		cout << "after function" << m_user.size() << newm_garment2.size() << mask_newm_garment.size() << endl;
 		//imshow("user garment", m_user);
-		imshow("mask_newm_garment", mask_newm_garment);
+		//imshow("mask_newm_garment", mask_newm_garment);
 
 		/*Mat m_garment4(m_garment3.size(), m_garment3.type());
 		m_garment4 = positionCorrect(user_neck, newGarmentNeckPoint1, newm_garment2);
@@ -1304,49 +1305,47 @@ int CKinect::getGarmentHeight(Mat mask){
 	return 0;
 }
 void CKinect::combineGarmentAndBody(Mat& user, Mat& garment, Point bodyNeck, Point garmentNeck, Mat mask_garment){
+	cout << user.type() <<"type"<< garment.type()<<"type" << mask_garment.type() << endl;
+	cvtColor(garment, garment, CV_RGB2BGRA);
+	cout << user.type() << "type" << garment.type() << "type" << mask_garment.type() << endl;
 	int garrow = garment.rows;
 	int garcol = garment.cols;
 
 	int userrow = user.rows;
 	int usercol = user.cols;
-	Point temp = bodyNeck - garmentNeck;
+	Point temp = Point((bodyNeck.x - garmentNeck.x), bodyNeck.y - garmentNeck.y);
+	//Point temp(400,400);
 	int move = 0;
 	temp.x += move;
-	temp.y -= move;
+	//temp.y -= move;
 	cout << "diff of neck garment neck" << temp.x << "," << temp.y << endl;
 	cout << "function_user.size()" << user.size() << endl;
 	cout << "functon _garment.size()" << garment.size() << endl;
 	cout << "functon _mask_garment size()" << mask_garment.size() << endl;
+	Vec3b t = Vec3b(255, 255, 255);
 	int minleft = usercol;
 	int maxright = 0;
 	int minbottom = 0;
 	int maxtop = userrow;
 	int cnt = 0;
-	for (int i = 0; i < garrow; i++){
-		for (int j = 0; j < garcol; j++){
+	for (int i = 0; i < garcol; i++){
+		for (int j = 0; j < garrow; j++){
 			//if (temp.x + j>=0 && temp.y + i>=0 && temp.x + j<=usercol && temp.y + i<=userrow
 			//	&& !(mask_garment.at<Vec3b>(i, j)[0] || mask_garment.at<Vec3b>(i, j)[1] || mask_garment.at<Vec3b>(i, j)[2])){
-			if (temp.x + j >= 0 && temp.y + i >= 0 && temp.x + j < usercol && temp.y + i < userrow){
-				if (mask_garment.at<Vec3b>(i, j)[0] != 255 && mask_garment.at<Vec3b>(i, j)[1] != 255 && mask_garment.at<Vec3b>(i, j)[2] != 255){
-					user.at<Vec3b>(i + temp.y, j + temp.x)[0] = garment.at<Vec3b>(i, j)[0];
-					user.at<Vec3b>(i + temp.y, j + temp.x)[1] = garment.at<Vec3b>(i, j)[1];
-					user.at<Vec3b>(i + temp.y, j + temp.x)[2] = garment.at<Vec3b>(i, j)[2];
+			if (temp.x + i >= 0 && temp.y + j >= 0 && temp.x + i < usercol && temp.y + j < userrow){
+				if (mask_garment.at<Vec3b>(j, i) != t){
+					//user.at<Vec3b>(j + temp.y, i + temp.x)= garment.at<Vec3b>(j, i);
+					Vec4b t = garment.at<Vec4b>(j, i);
+					user.at<Vec4b>(j + temp.y, i + temp.x) = t;
 
-					maxright = j + temp.x >= maxright ? j + temp.x : maxright;
+					/*maxright = j + temp.x >= maxright ? j + temp.x : maxright;
 					minleft = j + temp.x <= minleft ? j + temp.x : minleft;
 					minbottom = i + temp.y > minbottom ? i + temp.y : minbottom;
-					maxtop = i + temp.y < maxtop ? i + temp.y : maxtop;
+					maxtop = i + temp.y < maxtop ? i + temp.y : maxtop;*/
 
 					cnt++;
 				}
-				/*else{
-				user.at<Vec3b>(i + temp.y, j + temp.x)[0] = 255;
-				user.at<Vec3b>(i + temp.y, j + temp.x)[1] = 255;
-				user.at<Vec3b>(i + temp.y, j + temp.x)[2] = 0;
-				}*/
-				if (i == garmentNeck.x && j == garmentNeck.y){
-					cout << "|i+temp.y,j+temp.x|"<<i + temp.y<<"," << j + temp.x << endl;
-				}
+
 			}
 		}
 	}
